@@ -1,21 +1,23 @@
-package vna.example.com.backingapp;
+package vna.example.com.backingapp.Models;
 
 /**
  * Created by Google       Company on 05/12/2017.
  */
 
-class StepItem {
+public class StepItem {
 
     String       id;
     String       shortDescription;
     String       description;
     String       videoURL;
+    String     thumbnailURL;
 
-    public StepItem(String id, String shortDescription, String description, String videoURL) {
+    public StepItem(String id, String shortDescription, String description, String videoURL,String thumbnailURL) {
         this.id = id;
         this.shortDescription = shortDescription;
         this.description = description;
         this.videoURL = videoURL;
+        this.thumbnailURL=thumbnailURL;
     }
 
 
@@ -34,4 +36,10 @@ class StepItem {
     public String getVideoURL() {
         return videoURL;
     }
+
+    public String getThumbnailURL() {
+        return thumbnailURL;
+    }
+
+
 }

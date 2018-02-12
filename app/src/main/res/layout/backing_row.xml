@@ -1,25 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-     android:layout_width="match_parent"
+    android:id="@+id/framing"
+    android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="155dp"
         android:id="@+id/Ingredient"
-        android:src="@mipmap/ic_launcher"
-        />
 
- <TextView
-     android:layout_width="wrap_content"
-     android:layout_height="wrap_content"
-     android:textSize="25sp"
-     android:id="@+id/Ingredient_name"
-     android:text="Ingredient_name"
-      android:layout_marginLeft="99dp"
-     android:layout_marginTop="55dp"
-     />
+        android:layout_width="133dp"
+        android:layout_height="444dp"
+        android:src="@drawable/recipe" />
 
+    <TextView
+        android:id="@+id/Ingredient_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="99dp"
+        android:layout_marginTop="55dp"
+        android:paddingLeft="88dp"
+        android:text="Ingredient_name"
+        android:textSize="25sp" />
 
 
 </FrameLayout>

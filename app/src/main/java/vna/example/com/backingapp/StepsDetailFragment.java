@@ -24,8 +24,13 @@ import com.google.android.exoplayer2.ui.SimpleExoPlayerView;
 import com.google.android.exoplayer2.upstream.BandwidthMeter;
 import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+
+import vna.example.com.backingapp.Models.StepItem;
+
+import static android.R.attr.thumbnail;
 
 
 /**
@@ -34,17 +39,30 @@ import java.util.ArrayList;
 public class StepsDetailFragment extends Fragment {
     private SimpleExoPlayer exoplayer;
     TextView descrption;
-    ImageView nextVideo, previosVideo;
+    ImageView nextVideo, previosVideo,thumbnailURL;
     private SimpleExoPlayerView exoplayerView;
     private long playbackposition;
+    String  thumbnail="";
     private int currentwindow;
-    private boolean playwhenready = true;
+    private boolean playwhenready = false;
+    public String playwhenreadyKey = "playWhenReadyKey";
     ArrayList<StepItem> mStepItems = new ArrayList<>();
     DetailBackingFragment mDetailBackingFragment;
     int position;
+    String description = "";
+    String descriptionKey = "Description";
+
+
+    String videoURL = "";
+    String videoURLKey = "videoURL";
+    String positionKey = "positionKey";
+    long positionMin = -1;
+    String TAG = "StepsDetailFragment";
 
     public StepsDetailFragment() {
     }
+
+    Bundle bundle = null;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -53,18 +71,37 @@ public class StepsDetailFragment extends Fragment {
         exoplayerView = (SimpleExoPlayerView) view.findViewById(R.id.player_view);
         nextVideo = (ImageView) view.findViewById(R.id.nextVideo);
         previosVideo = (ImageView) view.findViewById(R.id.previousVideo);
+        thumbnailURL= (ImageView) view.findViewById(R.id.img);
         descrption = (TextView) view.findViewById(R.id.description);
-        Bundle bundle=getArguments();
-        Log.i("Description",bundle.getString("Description"));
-
-        initialzeplayer(bundle.getString("videoURL"));
-        descrption.setText(bundle.getString("Description"));
+        if (savedInstanceState != null) {
+            Log.i(TAG, "onCreateView playback position" + savedInstanceState.getLong(positionKey) + "");
+            bundle = savedInstanceState;
+        } else {
+            Log.i(TAG, "savedInstance is null");
+            bundle = getArguments();
+        }
 
         mDetailBackingFragment = new DetailBackingFragment();
         mStepItems = mDetailBackingFragment.stepsList;
-        position = Integer.parseInt(bundle.getString("id"));
+        position = bundle.getInt("id");
+        Log.i("pppppiooj",position+"");
 
-        Log.i("ijjj",bundle.getString("id"));
+        setPosition(position);
+        if (mStepItems.get(position).getVideoURL() != null){
+
+            setVideoURL(mStepItems.get(position).getVideoURL());
+            initialzeplayer(mStepItems.get(position).getVideoURL());
+
+        }
+        descrption.setText(mStepItems.get(position).getDescription());
+        Log.i("oooooooooo",mStepItems.get(position).getThumbnailURL());
+
+        thumbnail=mStepItems.get(position).getThumbnailURL();
+        if (!thumbnail .equals("")) {
+            Picasso.with(getContext()).load(thumbnail).into(thumbnailURL);
+        }
+
+
         nextVideo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -72,8 +109,13 @@ public class StepsDetailFragment extends Fragment {
                     position++;
                     releasePlayer();
                     descrption.setText(mStepItems.get(position).getDescription());
-                    initialzeplayer(mStepItems.get(position).getVideoURL());
-
+                    thumbnail=mStepItems.get(position).getThumbnailURL();
+                    if (!thumbnail .equals("")) {
+                        Picasso.with(getContext()).load(thumbnail).into(thumbnailURL);
+                    }
+                    setPosition(position);
+                    if (mStepItems.get(position).getVideoURL() != null)
+                        initialzeplayer(mStepItems.get(position).getVideoURL());
                 } else {
 
                 }
@@ -87,7 +129,13 @@ public class StepsDetailFragment extends Fragment {
                     position--;
                     releasePlayer();
                     descrption.setText(mStepItems.get(position).getDescription());
-                    initialzeplayer(mStepItems.get(position).getVideoURL());
+                    setPosition(position);
+                    thumbnail=mStepItems.get(position).getThumbnailURL();
+                    if (!thumbnail .equals("")) {
+                        Picasso.with(getContext()).load(thumbnail).into(thumbnailURL);
+                    }
+                    if (mStepItems.get(position).getVideoURL() != null)
+                        initialzeplayer(mStepItems.get(position).getVideoURL());
                 } else {
 
                 }
@@ -115,7 +163,7 @@ public class StepsDetailFragment extends Fragment {
     }
 
     public void initialzeplayer(String videourl) {
-
+        Log.i(TAG, "initialize player ");
 
         try {
 
@@ -127,10 +175,20 @@ public class StepsDetailFragment extends Fragment {
             Uri videouri = Uri.parse(videourl);
             MediaSource mediaSource = new ExtractorMediaSource(videouri, dataSourceFactory, extractorsFactory, null, null);
             exoplayerView.setPlayer(exoplayer);
-            exoplayer.prepare(mediaSource);
+            long retrievedPlaybackPosition = bundle.getLong(positionKey, -1);
+            boolean retrievedPlayWhenReady  = bundle.getBoolean(playwhenreadyKey);
+            if (retrievedPlaybackPosition != -1) {
 
-            exoplayer.setPlayWhenReady(playwhenready);
-            exoplayer.setPlayWhenReady(true);
+                exoplayer.seekTo(retrievedPlaybackPosition);
+                exoplayer.prepare(mediaSource);
+                exoplayer.setPlayWhenReady(retrievedPlayWhenReady);
+
+            }else {
+
+                exoplayer.prepare(mediaSource);
+                exoplayer.setPlayWhenReady(true);
+            }
+
 
         } catch (Exception e) {
             System.out.print("tttt");
@@ -163,6 +221,37 @@ public class StepsDetailFragment extends Fragment {
     }
 
 
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        Log.i(TAG, "savedInstanceState play back position " + playbackposition);
+        outState.putLong(positionKey, playbackposition);
+        outState.putInt("id", getPosition());
+        outState.putBoolean(playwhenreadyKey, playwhenready);
+    }
 
 
+    public void setVideoURL(String videoURL) {
+        this.videoURL = videoURL;
+    }
+
+    public String getVideoURL() {
+        return videoURL;
+    }
+
+    public void setDescription(String description) {
+        description = description;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setPosition(int position) {
+        this.position = position;
+    }
+
+    public int getPosition() {
+        return position;
+    }
 }

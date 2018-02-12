@@ -1,10 +1,10 @@
-package vna.example.com.backingapp;
+package vna.example.com.backingapp.Models;
 
 /**
  * Created by Google       Company on 05/12/2017.
  */
 
-class IngrediantItem {
+public class IngrediantItem {
     String     quantity;
     String     measure;
     String     ingredient;

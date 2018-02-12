@@ -6,9 +6,12 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+
+import vna.example.com.backingapp.Models.BackingsItemModel;
 
 /**
  * Created by Google       Company on 05/12/2017.
@@ -50,23 +53,17 @@ public class BackingAdapter extends RecyclerView.Adapter<BackingAdapter.BackingI
 
     public class BackingItemRowHolder extends RecyclerView.ViewHolder {
         TextView Ingredient_name;
-
+        FrameLayout mFrameLayout;
         public BackingItemRowHolder(View itemView) {
             super(itemView);
 
             Ingredient_name = (TextView) itemView.findViewById(R.id.Ingredient_name);
-
-            Ingredient_name.setOnClickListener(new View.OnClickListener() {
+            mFrameLayout=(FrameLayout) itemView.findViewById(R.id.framing);
+            mFrameLayout.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     Intent detail = new Intent(mcontext, DetailBacking.class);
                    detail.putExtra("name",backingItem.get(getAdapterPosition()).getiIngredient_name());
-                /*    detail.putExtra("Measure",ingrediantsList.get(getAdapterPosition()).getMeasure());
-                    detail.putExtra("Quantity",ingrediantsList.get(getAdapterPosition()).getQuantity());
-                    detail.putExtra("Id",stepsList.get(getAdapterPosition()).getId());
-                    detail.putExtra("Description",stepsList.get(getAdapterPosition()).getDescription());
-                    detail.putExtra("ShortDescription",stepsList.get(getAdapterPosition()).getShortDescription());
-                    detail.putExtra("VideoURL",stepsList.get(getAdapterPosition()).getVideoURL());*/
                     mcontext.startActivity(detail);
 
                 }

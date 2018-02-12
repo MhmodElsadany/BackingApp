@@ -2,6 +2,7 @@ package vna.example.com.backingapp;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -21,6 +22,10 @@ import java.util.List;
 import java.util.Map;
 
 import io.realm.Realm;
+import vna.example.com.backingapp.Models.BackingsItemModel;
+import vna.example.com.backingapp.Models.IngrediantItem;
+import vna.example.com.backingapp.Models.RelamData;
+import vna.example.com.backingapp.Models.StepItem;
 
 public class MainActivity extends AppCompatActivity {
     StringRequest stringRequest;
@@ -29,12 +34,17 @@ public class MainActivity extends AppCompatActivity {
     ArrayList<IngrediantItem> ingrediantsList = new ArrayList<>();
     ArrayList<StepItem> stepsList = new ArrayList<>();
     Realm realm;
-
+    LinearLayoutManager mLinearLayoutManager ;
+     int position;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         mRecyclerView = (RecyclerView) findViewById(R.id.backing_list);
+
+        if (savedInstanceState != null) {
+            position = savedInstanceState.getInt("positioning");
+        }
 
 
         String url = "https://d17h27t6h515a5.cloudfront.net/topher/2017/May/59121517_baking/baking.json";
@@ -55,7 +65,7 @@ public class MainActivity extends AppCompatActivity {
 
                                 JSONArray jsonArrayIngrediant = jsonObject1.getJSONArray("ingredients");
                                 JSONArray jsonArrayStep = jsonObject1.getJSONArray("steps");
-                                 String integerateItem = "";
+                                String integerateItem = "";
 
                                 for (int j = 0; j < jsonArrayIngrediant.length(); j++) {
                                     JSONObject jsonObjectinteg = jsonArrayIngrediant.getJSONObject(j);
@@ -92,7 +102,8 @@ public class MainActivity extends AppCompatActivity {
                                     stepsList.add(new StepItem
                                             (jsonObjectstep.getString("id"), jsonObjectstep.getString("shortDescription"),
                                                     jsonObjectstep.getString("description")
-                                                    , jsonObjectstep.getString("videoURL")));
+                                                    , jsonObjectstep.getString("videoURL"),
+                                                    jsonObjectstep.getString("thumbnailURL")));
                                     Log.i("mmmmm", jsonObjectstep.getString("id") + jsonObjectstep.getString("shortDescription")
                                             + jsonObjectstep.getString("description"));
 
@@ -103,9 +114,11 @@ public class MainActivity extends AppCompatActivity {
 
                         }
                         Log.i("mmmmm", "mmmmm9");
-
-                        mRecyclerView.setLayoutManager(new LinearLayoutManager(MainActivity.this));
+                         mLinearLayoutManager=new LinearLayoutManager(MainActivity.this);
+                        mRecyclerView.setLayoutManager(mLinearLayoutManager);
                         BackingAdapter moviesAdapter = new BackingAdapter(MainActivity.this, backingItem/*, stepsList, ingrediantsList*/);
+
+                        mRecyclerView.scrollToPosition(position);
                         mRecyclerView.setAdapter(moviesAdapter);
                         moviesAdapter.notifyDataSetChanged();
 
@@ -133,5 +146,15 @@ public class MainActivity extends AppCompatActivity {
         }
 
     }
+
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        outState.putInt("mRecyclerView",mRecyclerView.getVerticalScrollbarPosition());
+        int recyclerStateBeforeRotate = mLinearLayoutManager.findFirstCompletelyVisibleItemPosition();
+        outState.putInt("positioning", recyclerStateBeforeRotate);
+        Log.i("position",recyclerStateBeforeRotate+"");
+    }
+
 
 }

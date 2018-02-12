@@ -4,10 +4,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
-import android.widget.Toast;
-
-import static android.R.attr.id;
 
 public class ActivityStepsDetail extends AppCompatActivity {
 
@@ -20,12 +16,15 @@ public class ActivityStepsDetail extends AppCompatActivity {
         Intent intent = getIntent();
         Bundle bundle = intent.getExtras();
 
+        if (savedInstanceState == null) {
+            StepsDetailFragment mStepsDetailFragment = new StepsDetailFragment();
+            mStepsDetailFragment.setArguments(bundle);
 
-        StepsDetailFragment mStepsDetailFragment=new StepsDetailFragment();
-        mStepsDetailFragment.setArguments(bundle);
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragment3, mStepsDetailFragment, "").commit();
+        }
 
-        getSupportFragmentManager().beginTransaction().replace(R.id.fragment3 ,mStepsDetailFragment,"").commit();
 
     }
+
 
 }

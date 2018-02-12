@@ -9,6 +9,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -18,7 +19,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -28,8 +28,9 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+
+import vna.example.com.backingapp.Models.IngrediantItem;
+import vna.example.com.backingapp.Models.StepItem;
 
 import static android.content.Context.MODE_PRIVATE;
 
@@ -64,7 +65,7 @@ class DetailAdapter extends RecyclerView.Adapter<DetailAdapter.DetailItemRowHold
         holder.step_Des_name.setText(stepItemsllist.get(position));
 
         if (!holder.step_Des_name.getText().equals(stepItemsllist.get(0)))
-            holder.step_Des_name.setOnClickListener(new View.OnClickListener() {
+            holder.mCardView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     listner.setData(stepsList.get(position - 1).getId(),
@@ -92,11 +93,14 @@ class DetailAdapter extends RecyclerView.Adapter<DetailAdapter.DetailItemRowHold
 
     public class DetailItemRowHolder extends RecyclerView.ViewHolder {
         TextView step_Des_name;
+        CardView mCardView;
 
         public DetailItemRowHolder(View itemView) {
             super(itemView);
 
             step_Des_name = (TextView) itemView.findViewById(R.id.text);
+
+            mCardView = (CardView) itemView.findViewById(R.id.card_txt);
         }
     }
 
@@ -104,7 +108,7 @@ class DetailAdapter extends RecyclerView.Adapter<DetailAdapter.DetailItemRowHold
 
 
 public class DetailBackingFragment extends Fragment implements DetailAdapter.Listner {
-
+    public String TAG = "DetailBackingFragment";
     ArrayList<IngrediantItem> ingrediantsList = new ArrayList<>();
     public static ArrayList<StepItem> stepsList = new ArrayList<>();
     RecyclerView recyclerView;
@@ -139,13 +143,12 @@ public class DetailBackingFragment extends Fragment implements DetailAdapter.Lis
         recyclerView = (RecyclerView) view.findViewById(R.id.steps_detai_llist);
         Toolbar toolbar = (Toolbar) view.findViewById(R.id.toolbar);
         toolbar.setTitle(getActivity().getIntent().getStringExtra("name"));
-        Log.i(" nameeeeeeeeeeeee",getActivity().getIntent().getStringExtra("name"));
+        Log.i(TAG, "onCreateView : " + getActivity().getIntent().getStringExtra("name"));
         AppCompatActivity activity = (AppCompatActivity) getActivity();
 
         activity.setSupportActionBar(toolbar);
         activity.getSupportActionBar().setHomeButtonEnabled(true);
         activity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
 
 
         String url = "https://d17h27t6h515a5.cloudfront.net/topher/2017/May/59121517_baking/baking.json";
@@ -168,9 +171,10 @@ public class DetailBackingFragment extends Fragment implements DetailAdapter.Lis
                                     editor.putString("idd", id);
                                     Log.i("id", id);
                                     editor.commit();
-
+                                    Log.i(TAG, "found recipe " + name);
                                     Intent intent = new Intent(getActivity(), MyWidgetProvider.class);
                                     intent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
+                                    intent.putExtra("name", name);
 
                                     int[] ids = AppWidgetManager.getInstance(getActivity()).getAppWidgetIds(new ComponentName(getActivity(), MyWidgetProvider.class));
                                     intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids);
@@ -179,6 +183,10 @@ public class DetailBackingFragment extends Fragment implements DetailAdapter.Lis
                                     JSONArray jsonArrayIngrediant = jsonObject1.getJSONArray("ingredients");
                                     JSONArray jsonArrayStep = jsonObject1.getJSONArray("steps");
 
+                                    if (ingrediantsList != null || stepsList != null) {
+                                        ingrediantsList.clear();
+                                        stepsList.clear();
+                                    }
                                     for (int j = 0; j < jsonArrayIngrediant.length(); j++) {
                                         JSONObject jsonObjectinteg = jsonArrayIngrediant.getJSONObject(j);
                                         ingrediantsList.add(new IngrediantItem
@@ -188,13 +196,21 @@ public class DetailBackingFragment extends Fragment implements DetailAdapter.Lis
                                                 + jsonObjectinteg.getString("ingredient"));
 
                                     }
-
+                                    int posit = 1;
+                                    int id_step = 0;
                                     for (int j = 0; j < jsonArrayStep.length(); j++) {
                                         JSONObject jsonObjectstep = jsonArrayStep.getJSONObject(j);
+                                        id_step = Integer.parseInt(jsonObjectstep.getString("id"));
+                                        if (posit != id_step + 1) {
+                                            id_step = posit - 1;
+                                        }
+                                        posit++;
                                         stepsList.add(new StepItem
-                                                (jsonObjectstep.getString("id"), jsonObjectstep.getString("shortDescription"),
+                                                (id_step + "", jsonObjectstep.getString("shortDescription"),
                                                         jsonObjectstep.getString("description")
-                                                        , jsonObjectstep.getString("videoURL")));
+                                                        , jsonObjectstep.getString("videoURL"),
+                                                        jsonObjectstep.getString("thumbnailURL")));
+
                                         Log.i("steps", jsonObjectstep.getString("id") + jsonObjectstep.getString("shortDescription")
                                                 + jsonObjectstep.getString("description"));
 
@@ -204,6 +220,9 @@ public class DetailBackingFragment extends Fragment implements DetailAdapter.Lis
                             }
                         } catch (Exception e) {
 
+                        }
+                        if (stepsLlist != null) {
+                            stepsLlist.clear();
                         }
                         String integerateItem = "";
                         for (int i = 0; i < ingrediantsList.size(); i++) {
@@ -231,11 +250,6 @@ public class DetailBackingFragment extends Fragment implements DetailAdapter.Lis
                         System.out.println(error.getMessage());
                     }
                 }) {
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                HashMap<String, String> map = new HashMap<>();
-                return map;
-            }
         };
         Singleton.getInstance(getActivity()).addRequestQue(stringRequest);
 
@@ -258,4 +272,7 @@ public class DetailBackingFragment extends Fragment implements DetailAdapter.Lis
 
     }
 }
+
+
+/*       */
 

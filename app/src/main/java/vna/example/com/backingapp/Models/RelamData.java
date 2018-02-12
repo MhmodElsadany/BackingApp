@@ -1,4 +1,4 @@
-package vna.example.com.backingapp;
+package vna.example.com.backingapp.Models;
 
 import io.realm.Realm;
 import io.realm.RealmObject;
