@@ -1,4 +1,4 @@
-package vna.example.com.backingapp;
+package vna.example.com.backingapp.UserInterface;
 
 import android.app.Activity;
 import android.appwidget.AppWidgetManager;
@@ -31,6 +31,9 @@ import java.util.ArrayList;
 
 import vna.example.com.backingapp.Models.IngrediantItem;
 import vna.example.com.backingapp.Models.StepItem;
+import vna.example.com.backingapp.R;
+import vna.example.com.backingapp.others.MyWidgetProvider;
+import vna.example.com.backingapp.others.Singleton;
 
 import static android.content.Context.MODE_PRIVATE;
 
@@ -99,7 +102,6 @@ class DetailAdapter extends RecyclerView.Adapter<DetailAdapter.DetailItemRowHold
             super(itemView);
 
             step_Des_name = (TextView) itemView.findViewById(R.id.text);
-
             mCardView = (CardView) itemView.findViewById(R.id.card_txt);
         }
     }
@@ -116,6 +118,7 @@ public class DetailBackingFragment extends Fragment implements DetailAdapter.Lis
     static ActivitiListener activitiListener = null;
     SharedPreferences sharedPreferences;
     SharedPreferences.Editor editor;
+    LinearLayoutManager mLayoutMananger;
 
     public DetailBackingFragment() {
     }
@@ -137,7 +140,7 @@ public class DetailBackingFragment extends Fragment implements DetailAdapter.Lis
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+                             final Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.fragment_main_detail, container, false);
         recyclerView = (RecyclerView) view.findViewById(R.id.steps_detai_llist);
@@ -149,6 +152,7 @@ public class DetailBackingFragment extends Fragment implements DetailAdapter.Lis
         activity.setSupportActionBar(toolbar);
         activity.getSupportActionBar().setHomeButtonEnabled(true);
         activity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        mLayoutMananger = new LinearLayoutManager(getActivity());
 
 
         String url = "https://d17h27t6h515a5.cloudfront.net/topher/2017/May/59121517_baking/baking.json";
@@ -174,9 +178,9 @@ public class DetailBackingFragment extends Fragment implements DetailAdapter.Lis
                                     Log.i(TAG, "found recipe " + name);
                                     Intent intent = new Intent(getActivity(), MyWidgetProvider.class);
                                     intent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
-                                    intent.putExtra("name", name);
 
-                                    int[] ids = AppWidgetManager.getInstance(getActivity()).getAppWidgetIds(new ComponentName(getActivity(), MyWidgetProvider.class));
+                                    int[] ids = AppWidgetManager.getInstance(getActivity())
+                                            .getAppWidgetIds(new ComponentName(getActivity(), MyWidgetProvider.class));
                                     intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids);
                                     getActivity().sendBroadcast(intent);
 
@@ -192,8 +196,6 @@ public class DetailBackingFragment extends Fragment implements DetailAdapter.Lis
                                         ingrediantsList.add(new IngrediantItem
                                                 (jsonObjectinteg.getString("quantity"), jsonObjectinteg.getString("measure"),
                                                         jsonObjectinteg.getString("ingredient")));
-                                        Log.i("الوصفات", jsonObjectinteg.getString("quantity") + jsonObjectinteg.getString("measure")
-                                                + jsonObjectinteg.getString("ingredient"));
 
                                     }
                                     int posit = 1;
@@ -211,9 +213,6 @@ public class DetailBackingFragment extends Fragment implements DetailAdapter.Lis
                                                         , jsonObjectstep.getString("videoURL"),
                                                         jsonObjectstep.getString("thumbnailURL")));
 
-                                        Log.i("steps", jsonObjectstep.getString("id") + jsonObjectstep.getString("shortDescription")
-                                                + jsonObjectstep.getString("description"));
-
 
                                     }
                                 }
@@ -224,9 +223,11 @@ public class DetailBackingFragment extends Fragment implements DetailAdapter.Lis
                         if (stepsLlist != null) {
                             stepsLlist.clear();
                         }
+
                         String integerateItem = "";
                         for (int i = 0; i < ingrediantsList.size(); i++) {
-                            integerateItem += ingrediantsList.get(i).getQuantity() + "  " + ingrediantsList.get(i).getMeasure() + "  " +
+                            integerateItem += ingrediantsList.get(i).getQuantity() + " " +
+                                    " " + ingrediantsList.get(i).getMeasure() + "  " +
                                     ingrediantsList.get(i).getIngredient() + "\n";
                         }
 
@@ -236,7 +237,17 @@ public class DetailBackingFragment extends Fragment implements DetailAdapter.Lis
                             String steping = stepsList.get(i).getShortDescription();
                             stepsLlist.add(steping);
                         }
-                        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+                        recyclerView.setLayoutManager(mLayoutMananger);
+                        if (savedInstanceState != null) {
+                            int sPosition = savedInstanceState.getInt("test", -1);
+                            Log.i(TAG, "saved instance not null " + sPosition);
+                            if (sPosition != -1) {
+
+                                recyclerView.scrollToPosition(sPosition);
+
+
+                            }
+                        }
                         DetailAdapter mDetailAdapter = new DetailAdapter(getActivity(), stepsLlist, stepsList);
                         mDetailAdapter.setLithner(DetailBackingFragment.this);
                         recyclerView.setAdapter(mDetailAdapter);
@@ -269,6 +280,15 @@ public class DetailBackingFragment extends Fragment implements DetailAdapter.Lis
         super.onAttach(activity);
         sharedPreferences = activity.getSharedPreferences("daataa", MODE_PRIVATE);
 
+
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        Log.e(TAG, "onSaveInstanceState");
+        int recyclerStateBeforeRotate = mLayoutMananger.findFirstCompletelyVisibleItemPosition();
+        outState.putInt("test", recyclerStateBeforeRotate);
 
     }
 }

@@ -5,10 +5,10 @@
     android:layout_height="match_parent">
 
     <ImageView
-        android:id="@+id/Ingredient"
-
+        android:id="@+id/immgs"
+        android:layout_marginLeft="17dp"
         android:layout_width="133dp"
-        android:layout_height="444dp"
+        android:layout_height="128dp"
         android:src="@drawable/recipe" />
 
     <TextView

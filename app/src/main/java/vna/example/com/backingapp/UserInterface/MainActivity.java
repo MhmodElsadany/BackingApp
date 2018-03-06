@@ -1,8 +1,7 @@
-package vna.example.com.backingapp;
+package vna.example.com.backingapp.UserInterface;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -22,10 +21,13 @@ import java.util.List;
 import java.util.Map;
 
 import io.realm.Realm;
+import vna.example.com.backingapp.CustomAdapter.BackingAdapter;
 import vna.example.com.backingapp.Models.BackingsItemModel;
 import vna.example.com.backingapp.Models.IngrediantItem;
 import vna.example.com.backingapp.Models.RelamData;
 import vna.example.com.backingapp.Models.StepItem;
+import vna.example.com.backingapp.R;
+import vna.example.com.backingapp.others.Singleton;
 
 public class MainActivity extends AppCompatActivity {
     StringRequest stringRequest;
@@ -34,17 +36,15 @@ public class MainActivity extends AppCompatActivity {
     ArrayList<IngrediantItem> ingrediantsList = new ArrayList<>();
     ArrayList<StepItem> stepsList = new ArrayList<>();
     Realm realm;
-    LinearLayoutManager mLinearLayoutManager ;
-     int position;
+    LinearLayoutManager mLayoutMananger;
+
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         mRecyclerView = (RecyclerView) findViewById(R.id.backing_list);
 
-        if (savedInstanceState != null) {
-            position = savedInstanceState.getInt("positioning");
-        }
+        mLayoutMananger = new LinearLayoutManager(this);
 
 
         String url = "https://d17h27t6h515a5.cloudfront.net/topher/2017/May/59121517_baking/baking.json";
@@ -60,8 +60,7 @@ public class MainActivity extends AppCompatActivity {
                             for (int i = 0; i < jsonArray.length(); i++) {
 
                                 JSONObject jsonObject1 = jsonArray.getJSONObject(i);
-                                backingItem.add(new BackingsItemModel(jsonObject1.getString("name")));
-
+                                backingItem.add(new BackingsItemModel(jsonObject1.getString("name"), jsonObject1.getString("image")));
 
                                 JSONArray jsonArrayIngrediant = jsonObject1.getJSONArray("ingredients");
                                 JSONArray jsonArrayStep = jsonObject1.getJSONArray("steps");
@@ -76,9 +75,6 @@ public class MainActivity extends AppCompatActivity {
                                             + "  " + jsonObjectinteg.getString("measure") + "  " +
                                             jsonObjectinteg.getString("ingredient") + "\n";
 
-
-                                    Log.i("oooooooooooop" + j, jsonObjectinteg.getString("quantity") + jsonObjectinteg.getString("measure")
-                                            + jsonObjectinteg.getString("ingredient"));
 
                                 }
 
@@ -104,8 +100,6 @@ public class MainActivity extends AppCompatActivity {
                                                     jsonObjectstep.getString("description")
                                                     , jsonObjectstep.getString("videoURL"),
                                                     jsonObjectstep.getString("thumbnailURL")));
-                                    Log.i("mmmmm", jsonObjectstep.getString("id") + jsonObjectstep.getString("shortDescription")
-                                            + jsonObjectstep.getString("description"));
 
 
                                 }
@@ -113,12 +107,15 @@ public class MainActivity extends AppCompatActivity {
                         } catch (Exception e) {
 
                         }
-                        Log.i("mmmmm", "mmmmm9");
-                         mLinearLayoutManager=new LinearLayoutManager(MainActivity.this);
-                        mRecyclerView.setLayoutManager(mLinearLayoutManager);
-                        BackingAdapter moviesAdapter = new BackingAdapter(MainActivity.this, backingItem/*, stepsList, ingrediantsList*/);
+                        mRecyclerView.setLayoutManager(mLayoutMananger);
+                        if (savedInstanceState != null) {
+                            int sPosition = savedInstanceState.getInt("test", -1);
+                            if (sPosition != -1) {
+                                mRecyclerView.scrollToPosition(sPosition);
+                            }
+                        }
 
-                        mRecyclerView.scrollToPosition(position);
+                        BackingAdapter moviesAdapter = new BackingAdapter(MainActivity.this, backingItem);
                         mRecyclerView.setAdapter(moviesAdapter);
                         moviesAdapter.notifyDataSetChanged();
 
@@ -129,32 +126,18 @@ public class MainActivity extends AppCompatActivity {
                     public void onErrorResponse(VolleyError error) {
                         System.out.println(error.getMessage());
                     }
-                }) {
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                HashMap<String, String> map = new HashMap<>();
-                return map;
-            }
-        };
+                });
         Singleton.getInstance(MainActivity.this).addRequestQue(stringRequest);
-        Log.i("hhhhhhh", "hhhhhhhhh");
-        Log.i(";;;;;;,", ingrediantsList.size() + "");
-        for (int i = 0; i < ingrediantsList.size(); i++) {
-
-            Log.i("elemnts ", ingrediantsList.get(i).getIngredient() + ingrediantsList.get(i)
-                    .getMeasure() + ingrediantsList.get(i).getQuantity());
-        }
 
     }
 
-    protected void onSaveInstanceState(Bundle outState) {
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
+        int reclerbeforerotate = mLayoutMananger.findFirstCompletelyVisibleItemPosition();
+        outState.putInt("test", reclerbeforerotate);
+        Log.i("reclerbeforerotate", reclerbeforerotate + "");
 
-        outState.putInt("mRecyclerView",mRecyclerView.getVerticalScrollbarPosition());
-        int recyclerStateBeforeRotate = mLinearLayoutManager.findFirstCompletelyVisibleItemPosition();
-        outState.putInt("positioning", recyclerStateBeforeRotate);
-        Log.i("position",recyclerStateBeforeRotate+"");
     }
-
 
 }

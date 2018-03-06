@@ -1,4 +1,4 @@
-package vna.example.com.backingapp;
+package vna.example.com.backingapp.others;
 
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
@@ -12,7 +12,9 @@ import android.widget.RemoteViews;
 import java.util.List;
 
 import io.realm.Realm;
+import vna.example.com.backingapp.UserInterface.DetailBackingActivity;
 import vna.example.com.backingapp.Models.RelamData;
+import vna.example.com.backingapp.R;
 
 import static android.content.Context.MODE_PRIVATE;
 
@@ -45,7 +47,7 @@ public class MyWidgetProvider extends AppWidgetProvider {
         }
 
 
-        Intent intent = new Intent(context, DetailBacking.class);
+        Intent intent = new Intent(context, DetailBackingActivity.class);
         intent.putExtra("name", mRelamDatas.get(position - 1).getName());
         intent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
 

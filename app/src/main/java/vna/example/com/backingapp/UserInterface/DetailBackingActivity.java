@@ -1,14 +1,16 @@
-package vna.example.com.backingapp;
+package vna.example.com.backingapp.UserInterface;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
+import vna.example.com.backingapp.R;
 
-public class DetailBacking extends AppCompatActivity implements DetailBackingFragment.ActivitiListener {
+
+public class DetailBackingActivity extends AppCompatActivity implements DetailBackingFragment.ActivitiListener {
     boolean twoPane=false;
-    String TAG= "DetailBacking";
+    String TAG= "DetailBackingActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -16,10 +18,10 @@ public class DetailBacking extends AppCompatActivity implements DetailBackingFra
         setContentView(R.layout.activiti_main_detail);
         DetailBackingFragment mDetailBackingFragment=new DetailBackingFragment();
         if(savedInstanceState ==null){
-            Log.i("DetailBacking", "onSavedInstanceState not null");
+            Log.i("DetailBackingActivity", "onSavedInstanceState not null");
             getSupportFragmentManager().beginTransaction().replace(R.id.fragment1, mDetailBackingFragment,"").commit();
         }
-        Log.i("DetailBacking", "recieved name is "+getIntent().getStringExtra("name"));
+        Log.i("DetailBackingActivity", "recieved name is "+getIntent().getStringExtra("name"));
         if(findViewById(R.id.fragment2) !=null){
             twoPane = true;
         }

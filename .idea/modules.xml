@@ -4,6 +4,8 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/BackingApp.iml" filepath="$PROJECT_DIR$/BackingApp.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://E:\androidpp\BackingApp\myandroidlibrary\myandroidlibrary.iml" filepath="E:\androidpp\BackingApp\myandroidlibrary\myandroidlibrary.iml" />
+      <module fileurl="file://E:\androidpp\BackingApp\mylibrary\mylibrary.iml" filepath="E:\androidpp\BackingApp\mylibrary\mylibrary.iml" />
     </modules>
   </component>
 </project>

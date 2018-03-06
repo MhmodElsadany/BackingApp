@@ -1,4 +1,4 @@
-package vna.example.com.backingapp;
+package vna.example.com.backingapp.UserInterface;
 
 import android.content.res.Configuration;
 import android.net.Uri;
@@ -29,8 +29,7 @@ import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 
 import vna.example.com.backingapp.Models.StepItem;
-
-import static android.R.attr.thumbnail;
+import vna.example.com.backingapp.R;
 
 
 /**
@@ -39,10 +38,10 @@ import static android.R.attr.thumbnail;
 public class StepsDetailFragment extends Fragment {
     private SimpleExoPlayer exoplayer;
     TextView descrption;
-    ImageView nextVideo, previosVideo,thumbnailURL;
+    ImageView nextVideo, previosVideo, thumbnailURL;
     private SimpleExoPlayerView exoplayerView;
     private long playbackposition;
-    String  thumbnail="";
+    String thumbnail = "";
     private int currentwindow;
     private boolean playwhenready = false;
     public String playwhenreadyKey = "playWhenReadyKey";
@@ -68,11 +67,12 @@ public class StepsDetailFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_activity_steps_detail, container, false);
-        exoplayerView = (SimpleExoPlayerView) view.findViewById(R.id.player_view);
-        nextVideo = (ImageView) view.findViewById(R.id.nextVideo);
-        previosVideo = (ImageView) view.findViewById(R.id.previousVideo);
-        thumbnailURL= (ImageView) view.findViewById(R.id.img);
-        descrption = (TextView) view.findViewById(R.id.description);
+        exoplayerView =     (SimpleExoPlayerView) view.findViewById(R.id.player_view);
+        nextVideo     =     (ImageView) view.findViewById(R.id.nextVideo);
+        previosVideo  =     (ImageView) view.findViewById(R.id.previousVideo);
+        thumbnailURL  =     (ImageView) view.findViewById(R.id.img);
+        descrption    =     (TextView) view.findViewById(R.id.description);
+
         if (savedInstanceState != null) {
             Log.i(TAG, "onCreateView playback position" + savedInstanceState.getLong(positionKey) + "");
             bundle = savedInstanceState;
@@ -84,20 +84,18 @@ public class StepsDetailFragment extends Fragment {
         mDetailBackingFragment = new DetailBackingFragment();
         mStepItems = mDetailBackingFragment.stepsList;
         position = bundle.getInt("id");
-        Log.i("pppppiooj",position+"");
 
         setPosition(position);
-        if (mStepItems.get(position).getVideoURL() != null){
+        if (mStepItems.get(position).getVideoURL() != null) {
 
             setVideoURL(mStepItems.get(position).getVideoURL());
             initialzeplayer(mStepItems.get(position).getVideoURL());
 
         }
         descrption.setText(mStepItems.get(position).getDescription());
-        Log.i("oooooooooo",mStepItems.get(position).getThumbnailURL());
 
-        thumbnail=mStepItems.get(position).getThumbnailURL();
-        if (!thumbnail .equals("")) {
+        thumbnail = mStepItems.get(position).getThumbnailURL();
+        if (!thumbnail.equals("")) {
             Picasso.with(getContext()).load(thumbnail).into(thumbnailURL);
         }
 
@@ -109,8 +107,8 @@ public class StepsDetailFragment extends Fragment {
                     position++;
                     releasePlayer();
                     descrption.setText(mStepItems.get(position).getDescription());
-                    thumbnail=mStepItems.get(position).getThumbnailURL();
-                    if (!thumbnail .equals("")) {
+                    thumbnail = mStepItems.get(position).getThumbnailURL();
+                    if (!thumbnail.equals("")) {
                         Picasso.with(getContext()).load(thumbnail).into(thumbnailURL);
                     }
                     setPosition(position);
@@ -130,8 +128,8 @@ public class StepsDetailFragment extends Fragment {
                     releasePlayer();
                     descrption.setText(mStepItems.get(position).getDescription());
                     setPosition(position);
-                    thumbnail=mStepItems.get(position).getThumbnailURL();
-                    if (!thumbnail .equals("")) {
+                    thumbnail = mStepItems.get(position).getThumbnailURL();
+                    if (!thumbnail.equals("")) {
                         Picasso.with(getContext()).load(thumbnail).into(thumbnailURL);
                     }
                     if (mStepItems.get(position).getVideoURL() != null)
@@ -176,14 +174,14 @@ public class StepsDetailFragment extends Fragment {
             MediaSource mediaSource = new ExtractorMediaSource(videouri, dataSourceFactory, extractorsFactory, null, null);
             exoplayerView.setPlayer(exoplayer);
             long retrievedPlaybackPosition = bundle.getLong(positionKey, -1);
-            boolean retrievedPlayWhenReady  = bundle.getBoolean(playwhenreadyKey);
+            boolean retrievedPlayWhenReady = bundle.getBoolean(playwhenreadyKey);
             if (retrievedPlaybackPosition != -1) {
 
                 exoplayer.seekTo(retrievedPlaybackPosition);
                 exoplayer.prepare(mediaSource);
                 exoplayer.setPlayWhenReady(retrievedPlayWhenReady);
 
-            }else {
+            } else {
 
                 exoplayer.prepare(mediaSource);
                 exoplayer.setPlayWhenReady(true);
@@ -191,7 +189,7 @@ public class StepsDetailFragment extends Fragment {
 
 
         } catch (Exception e) {
-            System.out.print("tttt");
+            System.out.print("error");
         }
     }
 

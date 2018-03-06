@@ -1,9 +1,11 @@
-package vna.example.com.backingapp;
+package vna.example.com.backingapp.UserInterface;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+
+import vna.example.com.backingapp.R;
 
 public class ActivityStepsDetail extends AppCompatActivity {
 
